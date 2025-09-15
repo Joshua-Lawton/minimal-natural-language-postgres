@@ -22,7 +22,10 @@
       e.preventDefault();
       const input = document.getElementById('userInput').value;
       document.getElementById('result').innerHTML = 'Loading...';
-      const res = await fetch('/query', {
+      // Use /query for local, /api/query for Vercel
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const endpoint = isLocal ? '/query' : '/api/query';
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input })

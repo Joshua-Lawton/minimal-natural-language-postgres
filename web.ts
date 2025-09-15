@@ -15,7 +15,7 @@ app.use(express.static('public'));
 // The static middleware now serves index.html at '/'
 
 // Handle query requests
-app.post('/query', async (req, res) => {
+app.post('/query', async (req: any, res: any) => {
   const { input } = req.body;
   try {
     const query = await generateQuery(input);
