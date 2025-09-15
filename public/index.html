@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Natural Language SQL Query</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    input, button { font-size: 1em; padding: 0.5em; }
+    table { border-collapse: collapse; margin-top: 1em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; }
+  </style>
+</head>
+<body>
+  <h2>Ask a question about unicorns</h2>
+  <form id="queryForm">
+    <input type="text" id="userInput" placeholder="e.g. unicorns in USA" size="40" required />
+    <button type="submit">Submit</button>
+  </form>
+  <div id="result"></div>
+  <script>
+    document.getElementById('queryForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const input = document.getElementById('userInput').value;
+      document.getElementById('result').innerHTML = 'Loading...';
+      const res = await fetch('/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input })
+      });
+      const data = await res.json();
+      if (data.error) {
+        document.getElementById('result').innerHTML = `<span style='color:red'>${data.error}</span>`;
+        return;
+      }
+      if (!data.rows || !data.rows.length) {
+        document.getElementById('result').innerHTML = 'No results.';
+        return;
+      }
+      // Build table
+      const cols = Object.keys(data.rows[0]);
+      let html = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+      html += data.rows.map(row => '<tr>' + cols.map(c => `<td>${row[c]}</td>`).join('') + '</tr>').join('');
+      html += '</tbody></table>';
+      document.getElementById('result').innerHTML = html;
+    };
+  </script>
+</body>
+</html>
